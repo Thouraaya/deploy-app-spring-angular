@@ -6,6 +6,7 @@ services:
       - "0.0.0.0:4200:80"
   spring-boot-app:
     image: thourayab/spring-app:latest
+    restart: on-failure
     ports:
       - "0.0.0.0:8081:8081"
     environment:

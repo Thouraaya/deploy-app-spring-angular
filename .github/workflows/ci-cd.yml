@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build backend JAR
+        working-directory: springboot/app
+        run: mvn clean package -DskipTests
+
+      - name: Build backend Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-app:latest ./springboot/app
+
+      - name: Push backend Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-app:latest
+
+      - name: Build frontend Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest ./angular-app
+
+      - name: Push frontend Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest
+
+      - name: Test with Docker Compose
+        run: docker-compose up -d

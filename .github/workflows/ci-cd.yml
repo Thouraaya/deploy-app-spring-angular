@@ -36,7 +36,9 @@ jobs:
         run: docker push thourayab/angular-app:latest
 
       - name: Test with Docker Compose
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          docker pull thourayab/spring-app:latest
-          docker pull thourayab/angular-app:latest
+          echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker compose up -d
